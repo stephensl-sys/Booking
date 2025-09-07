@@ -1,0 +1,12 @@
+{
+  "name": "booking-backend",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "seed": "node seed/bookingSeed.js",
+    "test": "echo \"No tests configured\""
+  },
+  "dependencies": {
+    "mongoose": "^7.0.0"
+  }
+}
