@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Performance Booking Hub — updated</title>
+  <style>
+    :root{
+      --bg: #f5f6f8;
+      --bg-2: #eef1f4;
+      --surface: #ffffff;
+      --surface-2: #f7f8fa;
+      --text: #1f2328;
+      --text-muted: #6b7280;
+      --text-strong: #0b0d0f;
+      --border: rgba(16,24,40,0.08);
+      --ring: rgba(16,24,40,0.14);
+      --primary: #111315;
+      --primary-contrast: #ffffff;
+      --accent: #9aa1a9;
+      --shadow-lg: 0 20px 60px rgba(16, 24, 40, 0.10);
+      --shadow-md: 0 10px 30px rgba(16, 24, 40, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at -10% -10%, #ffffff 0%, transparent 60%),
+        radial-gradient(900px 600px at 120% 0%, #ffffff 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      min-height: 100vh;
+    }
+
+    .header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.7); backdrop-filter: saturate(1.2) blur(8px); -webkit-backdrop-filter: saturate(1.2) blur(8px); border-bottom: 1px solid var(--border); }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display:flex; align-items:center; gap:10px; }
+    .logo-badge { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(180deg,#f8fafc,#eef2f7); border:1px solid var(--border); box-shadow: var(--shadow-md); display:grid; place-items:center; font-size:18px; }
+    .logo-text { font-weight: 750; letter-spacing: .2px; font-size: 18px; background: linear-gradient(180deg,#1a1d21,#5a6169); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip:text; }
+
+    .main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 56px; }
+
+    .page-title { font-size: 42px; line-height: 1.05; letter-spacing: -0.02em; text-align: center; color: var(--text-strong); margin-bottom: 8px; }
+    .page-subtitle { text-align:center; color: var(--text-muted); margin-bottom: 32px; }
+
+    .btn { appearance:none; border:1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; padding: 12px 16px; border-radius: 12px; cursor:pointer; transition: all .2s ease; box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+    .btn-primary { background: var(--primary); color: var(--primary-contrast); border-color: rgba(17,19,21,.8); }
+    .btn-primary:hover { box-shadow: 0 10px 24px rgba(17,19,21,.25); }
+    .btn-secondary { background: var(--surface); color: var(--text); }
+    .btn-danger { background: #b42318; color: #fff; border-color: #a11d14; }
+    .btn-ghost { background: transparent; }
+
+    .login-selection { display:flex; justify-content:center; gap: 10px; margin-bottom: 28px; flex-wrap:wrap; }
+    .login-type-btn { padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; cursor:pointer; font-weight: 650; color: var(--text); transition: all .2s ease; }
+    .login-type-btn.active { background: #121417; color: #fff; border-color: rgba(17,19,21,.8); box-shadow: 0 12px 32px rgba(17,19,21,.25); transform: translateY(-1px); }
+
+    .grid-cards { display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 18px; margin-bottom: 36px; }
+    .card { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-md); transition: transform .25s ease, box-shadow .25s ease; }
+    .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .card-icon { width:48px; height:48px; border-radius: 12px; display:grid; place-items:center; font-size: 24px; background: #f3f5f7; border:1px solid var(--border); margin-bottom: 14px; }
+    .card-title { font-size: 20px; font-weight: 750; color: var(--text-strong); margin-bottom: 6px; }
+    .card-desc { color: var(--text-muted); }
+
+    .stats-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 16px; margin: 18px 0 26px; }
+    .stat { background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 20px; text-align:center; transition: transform .2s ease, box-shadow .2s ease; cursor:pointer; }
+    .stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .stat-number { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text-strong) !important; }
+    .stat-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; }
+
+    .calendar { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin: 18px 0; box-shadow: var(--shadow-md); }
+    .calendar-header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 16px; }
+    .calendar-title { font-size: 20px; font-weight: 700; color: var(--text-strong); }
+    .calendar-grid { display:grid; grid-template-columns: repeat(7,1fr); gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .calendar-header-day { background: #111315; color: #fff; padding: 12px; text-align: center; font-weight: 700; letter-spacing: .02em; }
+    .calendar-day { background: var(--surface); padding: 14px; text-align:center; cursor:pointer; transition: background .15s ease, transform .15s ease, box-shadow .15s ease; min-height: 72px; display:flex; align-items:center; justify-content:center; position:relative; border: 0; }
+    .calendar-day:hover { background: #f5f7f9; }
+    .calendar-day small { position:absolute; bottom: 8px; left: 8px; right: 8px; font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .calendar-day.available { background: #eefdf3; color: #174b2b; }
+    .calendar-day.partial { background: #fff3e8; color: #7a3d12; font-weight: 700; }
+    .calendar-day.pending { background: #fff7d1; color: #7a5a00; }
+    .calendar-day.booked { background: #ffe4e6; color: #7a1d2a; font-weight: 700; }
+    .calendar-day.today { outline: 2px solid #111315; outline-offset: -2px; }
+    .calendar-day.other-month { background: #f1f3f5; color: #c0c6cc; cursor: default; }
+    .count-badge { position:absolute; top:8px; right:8px; padding: .18rem .5rem; border-radius: 999px; font-size: 11px; background: #111315; color: #fff; border:1px solid rgba(255,255,255,.6); }
+
+    .shell { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-md); }
+
+    .modal { display:none; position: fixed; inset: 0; z-index: 1000; background: rgba(17,19,21,0.44); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .modal-content { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg); width: min(980px, 92vw); margin: 5% auto; box-shadow: var(--shadow-lg); display:flex; flex-direction: column; max-height: 85vh; overflow: hidden; }
+    .modal-header { display:flex; align-items:center; gap:10px; padding: 16px 18px; border-bottom: 1px solid var(--border); position: sticky; top:0; background: inherit; z-index: 2; }
+    .modal-title { font-size: 18px; font-weight: 800; color: var(--text-strong); }
+    .modal-body { padding: 16px 18px; overflow: auto; }
+    .close { margin-left:auto; font-size: 22px; font-weight: 800; color: var(--text-muted); cursor:pointer; padding: 6px 8px; border-radius: 8px; }
+    .close:hover { color: var(--text-strong); background: var(--surface-2); }
+
+    .item { border:1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; transition: transform .15s ease, box-shadow .2s ease, background .2s ease; background: var(--surface); }
+    .item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); background: #fafbfd; }
+    .hint { color: var(--accent); font-size: 12px; margin-top: 6px; font-style: italic; }
+    .meta { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:.25rem .55rem; border-radius:999px; font-size:12px; background:#eef1f4; margin-right:6px; border:1px solid var(--border); }
+    .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+    .row { display:grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin: 8px 0; }
+    .input, select, textarea { width: 100%; padding: 10px 12px; border:1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text); }
+    label > span { display:block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+
+    .center { text-align:center; }
+    .mt-8 { margin-top: 8px; } .mt-12{margin-top:12px;} .mt-16{margin-top:16px;} .mt-20{margin-top:20px;}
+    .mb-16 { margin-bottom: 16px; }
+
+    @media (max-width: 768px){ .main{padding: 20px 16px 44px;} .page-title{font-size: 32px;} .row{grid-template-columns: 1fr;} }
+  </style>
+  <script>
+    // Guards so early clicks don't error
+    window.selectUserType = window.selectUserType || function(){ console.warn('[guard] selectUserType before load'); };
+    window.login = window.login || function(){ console.warn('[guard] login before load'); };
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-badge">PH</div>
+        <div class="logo-text">Performance Hub</div>
+      </div>
+      <div id="headerNav" style="display:none; gap:10px; align-items:center;">
+        <span id="userName" style="color:var(--text-muted); font-weight:600;">Guest</span>
+        <button class="btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section id="welcomeSection">
+      <h1 class="page-title">Performance Booking Hub</h1>
+      <p class="page-subtitle">Professional booking and client management — sleek, neutral UI.</p>
+
+      <div class="login-selection">
+        <div class="login-type-btn active" id="artistBtn" onclick="selectUserType('artist')">Artist Dashboard</div>
+        <div class="login-type-btn" id="clientBtn" onclick="selectUserType('client')">Client Portal</div>
+      </div>
+
+      <div class="grid-cards" id="loginCards">
+        <article class="card" onclick="login('artist')">
+          <div class="card-icon">🎤</div>
+          <div class="card-title">Artist Dashboard</div>
+          <p class="card-desc">Color-coded bookings, agency labels, PDF import. Click to enter.</p>
+        </article>
+      </div>
+
+      <div class="center mt-12">
+        <button class="btn-primary btn" onclick="testFunction()">Test JavaScript</button>
+        <button class="btn btn" onclick="showModal('pdfImportModal')">🧪 Test PDF Import</button>
+        <button class="btn btn" onclick="runSelfTests()">🧰 Run Self Tests</button>
+      </div>
+    </section>
+
+    <!-- Artist Dashboard -->
+    <section id="artistDashboard" style="display:none;">
+      <h2 class="page-title" style="font-size:34px;">Artist Dashboard</h2>
+      <p class="page-subtitle">Overview with bookings, quote queue, and client tools.</p>
+
+      <div class="stats-grid">
+        <div class="stat" onclick="showModal('totalBookingsModal')">
+          <div class="stat-number" id="totalBookingsCount">0</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat" onclick="showModal('upcomingShowsModal')">
+          <div class="stat-number" id="upcomingShowsCount">0</div>
+          <div class="stat-label">Upcoming Shows</div>
+        </div>
+        <div class="stat" onclick="showModal('pendingContractsModal')">
+          <div class="stat-number" id="pendingContractsCount">0</div>
+          <div class="stat-label">Pending Contracts</div>
+        </div>
+        <div class="stat" onclick="showModal('quoteRequestsModal')">
+          <div class="stat-number" id="quoteRequestsCount">0</div>
+          <div class="stat-label">Quote Requests</div>
+        </div>
+      </div>
+
+      <div class="shell mt-12">
+        <h3 style="font-size:18px; font-weight:800; color:var(--text-strong); margin-bottom:12px;">Quick Actions</h3>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px;">
+          <button class="btn" onclick="showModal('artistShowsModal')">Manage Shows</button>
+          <button class="btn" onclick="showModal('quoteRequestsModal')">Quote Requests</button>
+          <button class="btn" onclick="showModal('pdfImportModal')">📄 PDF Import</button>
+          <button class="btn" onclick="showModal('contractTemplatesModal')">Contract Templates</button>
+          <button class="btn" onclick="showModal('financialReportsModal')">Financial Reports</button>
+          <button class="btn" onclick="showModal('clientDatabaseModal')">Client Database</button>
+          <button class="btn" onclick="showModal('cancelCenterModal')">Cancel bookings</button>
+          <button class="btn" onclick="showModal('agencyManagerModal')">Manage Agencies</button>
+        </div>
+      </div>
+
+      <div class="calendar mt-16">
+        <div class="calendar-header">
+          <button class="btn" onclick="changeMonth(-1)">← Previous</button>
+          <div class="calendar-title" id="currentMonth">January 2025</div>
+          <button class="btn" onclick="changeMonth(1)">Next →</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <div class="shell mt-12">
+          <div>
+            <strong>Legend:</strong>
+            <span class="chip"><span class="dot" style="background:#7a1d2a"></span> Fully booked</span>
+            <span class="chip"><span class="dot" style="background:#7a5a00"></span> Pending (has events)</span>
+            <span class="chip"><span class="dot" style="background:#7a3d12"></span> Another slot available</span>
+            <span class="chip"><span class="dot" style="background:#174b2b"></span> Available</span>
+            <span class="chip"><span class="dot" style="background:#111315"></span> Today</span>
+          </div>
+          <div class="mt-12" style="border-top:1px solid var(--border); padding-top:12px;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text-muted);">
+              <input type="checkbox" id="toggleAgencyLegend" onchange="toggleAgencyLegend()" checked />
+              Show Agency Legend
+            </label>
+            <div id="agencyLegend" class="mt-8" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Client Dashboard -->
+    <section id="clientDashboard" style="display:none;">
+      <h2 class="page-title" style="font-size:34px;">Client Portal</h2>
+      <p class="page-subtitle">Request quotes, see bookings, and browse packages.</p>
+
+      <div class="stats-grid">
+        <div class="stat" onclick="showModal('myBookingsModal')">
+          <div class="stat-number" id="clientMyBookingsCount">0</div>
+          <div class="stat-label">My Bookings</div>
+        </div>
+        <div class="stat" onclick="showModal('myQuotesModal')">
+          <div class="stat-number" id="clientPendingQuotesCount">0</div>
+          <div class="stat-label">Pending Quotes</div>
+        </div>
+        <div class="stat" onclick="showModal('artistPortfolioModal')">
+          <div class="stat-number" id="clientPortfolioCount">0</div>
+          <div class="stat-label">Portfolio Items</div>
+        </div>
+        <div class="stat" onclick="showModal('clientMessagesModal')">
+          <div class="stat-number" id="clientMessagesCount">0</div>
+          <div class="stat-label">Messages</div>
+        </div>
+      </div>
+
+      <div class="shell mt-12">
+        <h3 style="font-size:18px; font-weight:800; color:var(--text-strong); margin-bottom:12px;">Quick Actions</h3>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
+          <button class="btn" onclick="showModal('artistShowsModal')">View Show Packages</button>
+          <button class="btn" onclick="showModal('artistPortfolioModal')">Artist Portfolio</button>
+          <button class="btn" onclick="showModal('myBookingsModal')">My Bookings</button>
+          <button class="btn" onclick="showModal('clientMediaModal')">My Event Media</button>
+          <button class="btn" onclick="showModal('paymentPortalModal')">Payment Portal</button>
+        </div>
+      </div>
+
+      <div class="calendar mt-16">
+        <h3 style="font-size:18px; font-weight:800; color:var(--text-strong); margin-bottom:12px;">My Calendar View</h3>
+        <div class="center mb-16" style="display:flex; gap:8px; justify-content:center;">
+          <button class="btn btn-primary" id="myBookingsCalBtn" onclick="switchClientCalendar('myBookings')">My Bookings</button>
+          <button class="btn" id="artistAvailabilityCalBtn" onclick="switchClientCalendar('artistAvailability')">Artist Availability</button>
+        </div>
+
+        <!-- My Bookings Calendar -->
+        <div id="myBookingsCalendar" style="display:block;">
+          <div class="calendar-header">
+            <button class="btn" onclick="changeMonth(-1)">← Previous</button>
+            <div class="calendar-title" id="clientCurrentMonth">January 2025</div>
+            <button class="btn" onclick="changeMonth(1)">Next →</button>
+          </div>
+          <div class="calendar-grid" id="clientCalendarGrid"></div>
+          <div class="shell mt-12">
+            <strong>My Bookings Legend:</strong>
+            <span class="chip">🔴 Fully booked</span>
+            <span class="chip">🟣 Another slot available</span>
+            <span class="chip">🟢 Available</span>
+            <span class="chip">🔵 Today</span>
+          </div>
+        </div>
+
+        <!-- Artist Availability Calendar -->
+        <div id="artistAvailabilityCalendar" style="display:none;">
+          <div id="noArtistAssigned" class="shell center" style="padding:30px; margin:16px 0;">
+            <div style="font-size:40px; margin-bottom:8px; color: var(--accent);">📅</div>
+            <h4 style="color:var(--text-strong); margin-bottom:6px;">No Artist Calendar Shared</h4>
+            <p style="color:var(--text-muted); max-width:520px; margin: 0 auto;">Once an artist shares their calendar with you, you'll be able to view availability here.</p>
+            <div class="mt-12">
+              <button class="btn btn-primary" onclick="requestCalendarAccess()">Request Calendar Access</button>
+              <button class="btn" onclick="toggleArtistAccess()">Demo: Toggle Artist Access</button>
+            </div>
+          </div>
+
+          <div id="sharedArtistCalendar" style="display:none;">
+            <div class="shell" style="background: var(--surface-2); border-style:dashed;">
+              <strong>Artist Calendar Access:</strong> You can now view availability for <span style="color:var(--text-strong);">Sarah Mitchell (Acoustic Performer)</span>
+            </div>
+            <div class="calendar-header mt-12">
+              <button class="btn" onclick="changeMonth(-1)">← Previous</button>
+              <div class="calendar-title" id="artistCurrentMonth">January 2025</div>
+              <button class="btn" onclick="changeMonth(1)">Next →</button>
+            </div>
+            <div class="calendar-grid" id="artistCalendarGrid"></div>
+            <div class="shell mt-12">
+              <strong>Artist Availability Legend:</strong>
+              <span class="chip">🟢 Available</span>
+              <span class="chip">🔴 Fully booked</span>
+              <span class="chip">🔵 Today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <div id="totalBookingsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">All Bookings</div><span class="close" onclick="hideModal('totalBookingsModal')">&times;</span></div><div id="totalBookingsBody" class="modal-body"></div></div></div>
+  <div id="upcomingShowsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Upcoming Shows</div><span class="close" onclick="hideModal('upcomingShowsModal')">&times;</span></div><div id="upcomingShowsBody" class="modal-body"></div></div></div>
+  <div id="quoteRequestsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Quote Requests</div><span class="close" onclick="hideModal('quoteRequestsModal')">&times;</span></div><div id="quoteRequestsBody" class="modal-body"></div></div></div>
+  <div id="pendingContractsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Pending Contracts</div><span class="close" onclick="hideModal('pendingContractsModal')">&times;</span></div><div id="pendingContractsBody" class="modal-body"></div></div></div>
+  <div id="contractTemplatesModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Contract Templates</div><span class="close" onclick="hideModal('contractTemplatesModal')">&times;</span></div><div id="contractTemplatesBody" class="modal-body"></div></div></div>
+  <div id="financialReportsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Financial Reports</div><span class="close" onclick="hideModal('financialReportsModal')">&times;</span></div><div id="financialReportsBody" class="modal-body"></div></div></div>
+  <div id="clientDatabaseModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Client Database</div><span class="close" onclick="hideModal('clientDatabaseModal')">&times;</span></div><div id="clientDatabaseBody" class="modal-body"></div></div></div>
+  <div id="pdfImportModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">PDF Import (Demo)</div><span class="close" onclick="hideModal('pdfImportModal')">&times;</span></div><div id="pdfImportBody" class="modal-body"></div></div></div>
+  <div id="diagnosticsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Self Tests</div><span class="close" onclick="hideModal('diagnosticsModal')">&times;</span></div><div id="diagnosticsBody" class="modal-body"></div></div></div>
+  <div id="dayModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="dayModalTitle">Bookings</div><span class="close" onclick="hideModal('dayModal')">&times;</span></div><div id="dayModalBody" class="modal-body"></div></div></div>
+  <div id="myBookingsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">My Bookings</div><span class="close" onclick="hideModal('myBookingsModal')">&times;</span></div><div id="myBookingsBody" class="modal-body"></div></div></div>
+  <div id="myQuotesModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">My Quotes (Pending)</div><span class="close" onclick="hideModal('myQuotesModal')">&times;</span></div><div id="myQuotesBody" class="modal-body"></div></div></div>
+  <div id="artistPortfolioModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Artist Portfolio</div><span class="close" onclick="hideModal('artistPortfolioModal')">&times;</span></div><div id="artistPortfolioBody" class="modal-body"></div></div></div>
+  <div id="clientMessagesModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Messages</div><span class="close" onclick="hideModal('clientMessagesModal')">&times;</span></div><div id="clientMessagesBody" class="modal-body"></div></div></div>
+  <div id="artistShowsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Show Packages</div><span class="close" onclick="hideModal('artistShowsModal')">&times;</span></div><div id="artistShowsBody" class="modal-body"></div></div></div>
+  <div id="clientMediaModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">My Event Media</div><span class="close" onclick="hideModal('clientMediaModal')">&times;</span></div><div id="clientMediaBody" class="modal-body"></div></div></div>
+  <div id="paymentPortalModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Payment Portal</div><span class="close" onclick="hideModal('paymentPortalModal')">&times;</span></div><div id="paymentPortalBody" class="modal-body"></div></div></div>
+
+  <!-- Cancel center -->
+  <div id="cancelCenterModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Cancel bookings</div>
+        <span class="close" onclick="hideModal('cancelCenterModal')">&times;</span>
+      </div>
+      <div id="cancelCenterBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Agencies manager -->
+  <div id="agencyManagerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Manage Agencies</div>
+        <span class="close" onclick="hideModal('agencyManagerModal')">&times;</span>
+      </div>
+      <div id="agencyManagerBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    // ====== State & demo data ======
+    const state = {
+      userType:'artist',
+      monthIndex:0,
+      sharedArtistAccess:false,
+      seeded:false,
+      calendarEntries:[],
+      byDate:new Map(),
+      dayCapacity: 2,
+      showAgencyLegend: true,
+      agencies: [] // {name,color}
+    };
+
+    const demo = {
+      allBookings:[], upcoming:[], quotes:[],
+      myBookings:[], myQuotes:[], portfolio:[], messages:[],
+      shows:[], media:[], payments:[], clients:[]
+    };
+
+    // ====== Utils ======
+    function formatCurrency(n){ return '£' + Number(n||0).toLocaleString('en-GB'); }
+    function yyMmDd(d){ return d.toISOString().slice(0,10); }
+    function startOfMonth(base){ return new Date(base.getFullYear(), base.getMonth(), 1); }
+    function addMonths(date,n){ return new Date(date.getFullYear(), date.getMonth()+n, 1); }
+    function daysInMonth(date){ return new Date(date.getFullYear(), date.getMonth()+1, 0).getDate(); }
+    function isSameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+    function toUK(iso){ try{ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch{ return iso; } }
+    function timeToMin(t){ if(!t) return null; const [h,m]=String(t).split(':').map(Number); return h*60+(m||0); }
+    function overlaps(a1,a2,b1,b2){ const A1=timeToMin(a1), A2=timeToMin(a2), B1=timeToMin(b1), B2=timeToMin(b2); if([A1,A2,B1,B2].some(v=>v==null)) return false; return Math.max(A1,B1) < Math.min(A2,B2); }
+    function hashHue(str){ let h=0; for(let i=0;i<str.length;i++) h=(h<<5)-h+str.charCodeAt(i); return Math.abs(h)%360; }
+    function colorForAgency(name){ const h=hashHue(name||'—'); return `hsl(${h} 65% 42%)`; }
+
+    function getDayAvailability(iso){
+      const list = (state.byDate.get(iso)||[]);
+      const count = list.length;
+      if(count===0) return 'available';
+      if(count < state.dayCapacity) return 'partial';
+      return 'full';
+    }
+    window.getDayAvailability = getDayAvailability;
+
+    // ====== Seed demo ======
+    function seedDemo(){ if(state.seeded) return;
+      const venues = ['The Grand Hotel','Conference Center','Midnight North','Ocean View Hall','Kings Arms','Royal Theatre','Canopy Suite'];
+      const towns  = ['Huddersfield','Leeds','Manchester','Liverpool','Blackpool','York','Sheffield'];
+      const clients= ['Ainsley Club','Beacon Hotel','Cedar Rooms','Lyndene Hotel','Midnight North'];
+      const agents = ['Flyde','Direct','North Agency','Prestige'];
+      const types  = ['Wedding','Corporate','Party','Public','Charity'];
+      // bookings with times
+      for(let i=1;i<=40;i++){
+        const status = (i%3===0? 'Confirmed' : (i%3===1? 'Pending' : 'Provisional'));
+        const start = (17+(i%5)).toString().padStart(2,'0')+':00';
+        const end   = (start.split(':')[0]*1+2).toString().padStart(2,'0')+':00';
+        demo.allBookings.push({
+          id:i, title:i%5===0?`Corporate Gala #${i}`:(i%2?`Wedding Reception #${i}`:`Birthday Party #${i}`),
+          date:`2025-${String(((i%12)+1)).padStart(2,'0')}-${String(((i*2)%28)+1).padStart(2,'0')}`,
+          venue:venues[i%venues.length], town:towns[i%towns.length], fee: 400+(i%9)*50,
+          status, agent:agents[i%agents.length], gigType:types[i%types.length], contact:clients[i%clients.length],
+          startTime:start, endTime:end
+        });
+      }
+      for(let i=1;i<=12;i++){
+        demo.upcoming.push({
+          id:i, title:i%3?`Wedding – ${clients[i%clients.length]}`:`Corporate – ${clients[i%clients.length]}`,
+          date:`2025-${String((i%12)+1).padStart(2,'0')}-${String(((i*3)%28)+1).padStart(2,'0')}`,
+          venue:venues[(i+1)%venues.length],
+          checklist:['Check song list','Confirm arrival time','Coordinate with venue','Test PA'].slice(0,(i%4)+1)
+        });
+      }
+      for(let i=1;i<=20;i++){
+        demo.clients.push({
+          id:i, name:clients[i%clients.length] + ' #' + i, email:`client${i}@email.com`, phone:`07${(400000000+i).toString().slice(0,9)}`,
+          last:`2025-${String(((i+2)%12)+1).padStart(2,'0')}-${String(((i*3)%28)+1).padStart(2,'0')}`,
+          agency: agents[i%agents.length]
+        });
+      }
+      // quotes (client + artist views)
+      for(let i=1;i<=18;i++){
+        const venue = venues[i%venues.length];
+        const town = towns[i%towns.length];
+        const eventType = types[i%types.length];
+        const start = (18+(i%4)).toString().padStart(2,'0')+':00';
+        const end   = (start.split(':')[0]*1+2).toString().padStart(2,'0')+':00';
+        const date  = `2025-${String((i%12)+1).padStart(2,'0')}-${String(((i*5)%28)+1).padStart(2,'0')}`;
+        demo.myQuotes.push({ id:1000+i, title:`${eventType} – ${venue}`, requested:date, status: (i%2?'Awaiting Reply':'Replied'), amount: 300 + (i%6)*75, venue, town, eventType, startTime:start, endTime:end });
+        const conflict = demo.allBookings.some(b=> b.date===date && overlaps(start,end,b.startTime,b.endTime));
+        demo.quotes.push({ id:i, name:'Prospect '+i, date, email:`prospect${i}@mail.com`, phone:`07${(300000000+i).toString().slice(0,9)}`, notes:'Please share options', town, venue, startTime:start, endTime:end, amount: 350+(i%5)*50, conflict });
+      }
+      for(let i=1;i<=18;i++)
+        demo.myBookings.push({ id:i, title:`My Booking #${i}`, date:`2025-${String((i%12)+1).padStart(2,'0')}-${String(((i*2)%28)+1).padStart(2,'0')}`, status: i%2?'Confirmed':'Pending', location:towns[i%towns.length], venue: venues[i%venues.length], startTime:'19:00', endTime:'21:00' });
+      for(let i=1;i<=30;i++) demo.portfolio.push({ id:i, title:`Live Clip #${i}`, type:(i%2?'Video':'Photo'), tags:['Soul','Wedding','Corporate','Live'].slice(0,(i%4)+1) });
+      for(let i=1;i<=14;i++) demo.messages.push({ id:i, from:'Client '+i, when:`${i}h ago`, excerpt:'Checking availability for our date…' });
+      for(let i=1;i<=8;i++)  demo.shows.push({ id:i, name:['Luthor Tribute (60m)','Acoustic Duo (2x45m)','Wedding Evening (2x45m)','Corporate Gala (90m)','Daytime Acoustic (60m)','NYE Premium (2x60m)'][i%6], price: 500+(i%6)*100, notes:'PA included; travel extra beyond 40 miles' });
+      for(let i=1;i<=16;i++) demo.media.push({ id:i, name:`Event Photo ${i}.jpg`, size:`${(500+i*23)} KB`, uploaded:`2025-0${(i%9)+1}-0${(i%7)+1}` });
+      for(let i=1;i<=12;i++) demo.payments.push({ id:i, invoice:`INV-${2025}${String(i).padStart(3,'0')}`, due:`2025-${String((i%12)+1).padStart(2,'0')}-15`, amount:350+(i%5)*125, status: i%3?'Paid':'Due' });
+
+      refreshCalendarFromDemo();
+      updateCounts();
+      state.seeded = true;
+    }
+
+    // ====== Build calendar data ======
+    function refreshCalendarFromDemo(){
+      state.calendarEntries = demo.allBookings.map(b => ({
+        date:b.date, title:b.title,
+        status: b.status==='Confirmed'?'booked':'pending',
+        agent:b.agent, gigType:b.gigType, venue:b.venue, town:b.town, fee:b.fee, contact:b.contact,
+        startTime:b.startTime, endTime:b.endTime
+      }));
+      rebuildByDateIndex();
+      recomputeFacets();
+      renderAllCalendars();
+    }
+    function rebuildByDateIndex(){
+      state.byDate = new Map();
+      state.calendarEntries.forEach(e => {
+        if(!state.byDate.has(e.date)) state.byDate.set(e.date, []);
+        state.byDate.get(e.date).push(e);
+      });
+    }
+    function recomputeFacets(){
+      const agentsSet=new Set();
+      state.calendarEntries.forEach(e=> agentsSet.add(e.agent));
+      const agents=[...agentsSet].filter(Boolean);
+      // merge into state.agencies (preserve color overrides)
+      agents.forEach(name=>{
+        if(!state.agencies.find(a=>a.name===name)){
+          state.agencies.push({name, color: colorForAgency(name)});
+        }
+      });
+    }
+
+    // ====== Rendering ======
+    function buildCalendar(gridEl, monthDate){
+      const today = new Date();
+      const first = startOfMonth(monthDate);
+      const firstDow = first.getDay();
+      const dim = daysInMonth(monthDate);
+      const prevMonth = addMonths(monthDate,-1);
+      const dimPrev = daysInMonth(prevMonth);
+      const headers = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(h=>`<div class="calendar-header-day">${h}</div>`).join('');
+      let cells='';
+      for(let i=0;i<firstDow;i++){
+        const dnum = dimPrev - firstDow + 1 + i;
+        cells += `<div class="calendar-day other-month">${dnum}</div>`;
+      }
+      for(let d=1; d<=dim; d++){
+        const thisDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
+        const iso = yyMmDd(thisDate);
+        const list = state.byDate.get(iso)||[];
+        const dayAvail = getDayAvailability(iso);
+        const hasPending = list.some(x=>x.status==='pending');
+        const classes = ['calendar-day'];
+        if(dayAvail==='available') classes.push('available');
+        else if(dayAvail==='partial') classes.push('partial');
+        else if(hasPending) classes.push('pending');
+        else classes.push('booked');
+        if(isSameDay(thisDate, today)) classes.push('today');
+        const label = (dayAvail==='available')? 'Available' : (dayAvail==='partial'? 'Available for another booking' : (hasPending? 'Pending (has events)' : 'Fully booked'));
+        const badge = list.length? `<span class="count-badge">${list.length}</span>` : '';
+        cells += `<div class="${classes.join(' ')}" data-date="${iso}" onclick="onDayClick('${iso}')">${d}${badge}<small>${label}</small></div>`;
+      }
+      const totalCells = firstDow + dim;
+      const rem = totalCells % 7;
+      const trail = rem===0?0:(7-rem);
+      for(let i=1;i<=trail;i++) cells += `<div class="calendar-day other-month">${i}</div>`;
+      gridEl.innerHTML = headers + cells;
+    }
+
+    function renderAllCalendars(){
+      const base = startOfMonth(addMonths(new Date(), state.monthIndex));
+      const monthName = base.toLocaleString('en-GB',{month:'long',year:'numeric'});
+      [['currentMonth','calendarGrid'], ['clientCurrentMonth','clientCalendarGrid'], ['artistCurrentMonth','artistCalendarGrid']].forEach(([labelId,gridId])=>{
+        const L=document.getElementById(labelId), G=document.getElementById(gridId);
+        if(L) L.textContent = monthName;
+        if(G) buildCalendar(G, base);
+      });
+      renderAgencyLegend();
+    }
+
+    function renderAgencyLegend(){
+      const wrap=document.getElementById('agencyLegend');
+      if(!wrap) return;
+      wrap.innerHTML = (state.showAgencyLegend? state.agencies.map(a=>{
+        const color = a.color || colorForAgency(a.name);
+        return `<span class="chip" style="border-color:${color}; color:${color}"><span class="dot" style="background:${color}"></span>${a.name}</span>`;
+      }).join('') : '');
+      const chk=document.getElementById('toggleAgencyLegend');
+      if(chk) chk.checked = !!state.showAgencyLegend;
+    }
+
+    // ====== Day modal (click calendar) ======
+    function coreOnDayClick(iso){
+      const list=(state.byDate.get(iso)||[]).slice().sort((a,b)=> (a.startTime||'').localeCompare(b.startTime||''));
+      const body=document.getElementById('dayModalBody');
+      const title=document.getElementById('dayModalTitle');
+      title.textContent = `Bookings • ${toUK(iso)}`;
+
+      if(state.userType === 'client'){
+        // Minimal info (city + time), request form CTA
+        const items = list.map((b)=>`<div class="item"><strong>${b.town||'City'}</strong><div class="meta">⏰ ${(b.startTime||'??:??')} – ${(b.endTime||'??:??')}</div></div>`);
+        const dayAvail = getDayAvailability(iso);
+        let cta = '';
+        if(dayAvail==='available' || dayAvail==='partial'){
+          cta = `<button class="btn btn-primary" onclick="openRequestQuoteForm('${iso}')">${dayAvail==='partial'?'Request Another Booking':'Request Quote'} for this Date</button>`;
+        } else {
+          cta = `<button class="btn" disabled title="No capacity left">Fully booked</button>`;
+        }
+        items.push(`<div class="item"><div class="meta">Quick request:</div><div id="rq-${iso}" class="mt-12">${cta}</div></div>`);
+        body.innerHTML = items.join('');
+        coreShowModal('dayModal');
+        return;
+      }
+
+      // Artist view: show details + Accept/Cancel/Delete + add form (with time + notes)
+      const items = list.map((b,idx)=>{
+        const conflicts = list.some(x=> x!==b && overlaps(b.startTime,b.endTime,x.startTime,x.endTime));
+        return `<div class="item${conflicts?'":" style="border-color:#ef4444"':''}">
+          <strong>${b.title}</strong>
+          <div class="meta">${toUK(b.date)} • ${b.venue||'Venue'}${b.town?', '+b.town:''} • ⏰ ${(b.startTime||'??:??')}–${(b.endTime||'??:??')} • <span class="chip">${b.status}</span> ${b.agent?'<span class="chip">'+b.agent+'</span>':''}</div>
+          ${conflicts?'<div class="hint" style="color:#b42318;">⚠ Time conflict on this day</div>':''}
+          <div class="mt-12" style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${b.status==='pending'?`<button class="btn btn-success" onclick="acceptEntry('${iso}', ${idx})">Accept</button>`:''}
+            <button class="btn" onclick="cancelEntryPrompt('${iso}', ${idx})">Cancel…</button>
+            <button class="btn" onclick="deleteBooking('${iso}', ${idx})">Delete</button>
+          </div>
+        </div>`;
+      });
+
+      items.push(`<div class="item" style="border-style:dashed;">
+        <strong>Add Booking</strong>
+        <div class="meta">Daily capacity: ${state.dayCapacity}. Current: ${(state.byDate.get(iso)||[]).length}</div>
+        <form class="mt-8" onsubmit="return addBookingFromForm(event, '${iso}')">
+          <div class="row">
+            <label><span>Title</span><input class="input" name="title" placeholder="Wedding – Smiths" required /></label>
+            <label><span>Venue</span><input class="input" name="venue" placeholder="Ocean View Hall" /></label>
+          </div>
+          <div class="row">
+            <label><span>Town / City</span><input class="input" name="town" placeholder="Leeds" /></label>
+            <label><span>Fee (£)</span><input class="input" name="fee" placeholder="500" type="number" min="0" /></label>
+          </div>
+          <div class="row">
+            <label><span>Status</span><select name="status" class="input"><option value="booked">Booked</option><option value="pending">Pending</option></select></label>
+            <label><span>Gig type</span><select name="gigType" class="input"><option>Wedding</option><option>Corporate</option><option>Party</option><option>Public</option><option>Charity</option></select></label>
+          </div>
+          <div class="row">
+            <label><span>Agent</span><input class="input" name="agent" placeholder="Flyde" /></label>
+            <label><span>Contact</span><input class="input" name="contact" placeholder="Client / contact person" /></label>
+          </div>
+          <div class="row">
+            <label><span>Time from</span><input class="input" name="start" type="time" /></label>
+            <label><span>Time to</span><input class="input" name="end" type="time" /></label>
+          </div>
+          <div class="row" style="grid-template-columns:1fr;">
+            <label><span>Notes / special requests</span><textarea class="input" name="notes" placeholder="PA, dress code, soundcheck…"></textarea></label>
+          </div>
+          <div class="mt-12" style="text-align:right;">
+            <button class="btn btn-primary" type="submit">Add</button>
+          </div>
+        </form>
+      </div>`);
+      body.innerHTML = items.join('');
+      coreShowModal('dayModal');
+    }
+
+    function openRequestQuoteForm(iso){
+      const wrap = document.getElementById(`rq-${iso}`);
+      if(!wrap) return;
+      wrap.innerHTML = `
+        <form onsubmit="return submitClientQuote(event, '${iso}')">
+          <div class="row">
+            <label><span>Your name</span><input class="input" name="name" required /></label>
+            <label><span>Email</span><input class="input" name="email" type="email" required /></label>
+          </div>
+          <div class="row">
+            <label><span>Phone</span><input class="input" name="phone" /></label>
+            <label><span>Venue / Location</span><input class="input" name="venue" /></label>
+          </div>
+          <div class="row">
+            <label><span>Time from</span><input class="input" name="start" type="time" required /></label>
+            <label><span>Time to</span><input class="input" name="end" type="time" required /></label>
+          </div>
+          <div class="row">
+            <label><span>Event type</span>
+              <select class="input" name="eventType">
+                <option>Wedding</option><option>Corporate</option><option>Party</option><option>Public</option><option>Charity</option>
+              </select>
+            </label>
+            <label><span>Budget (£)</span><input class="input" name="budget" type="number" min="0" /></label>
+          </div>
+          <div class="row" style="grid-template-columns:1fr;">
+            <label><span>Notes / special requests</span><textarea class="input" name="notes" placeholder="Song requests, timings, parking…"></textarea></label>
+          </div>
+          <div class="mt-12" style="text-align:right;">
+            <button class="btn" type="button" onclick="coreOnDayClick('${iso}')">Cancel</button>
+            <button class="btn btn-primary" type="submit">Send Request</button>
+          </div>
+        </form>`;
+    }
+
+    function submitClientQuote(e, iso){
+      e.preventDefault();
+      const f = e.target;
+      const name = f.name.value.trim();
+      const email = f.email.value.trim();
+      const phone = f.phone.value.trim();
+      const venue = f.venue.value.trim();
+      const eventType = f.eventType.value;
+      const budget = Number(f.budget.value||0);
+      const notes = f.notes.value.trim();
+      const start = f.start.value;
+      const end   = f.end.value;
+      const conflict = (state.byDate.get(iso)||[]).some(b=> overlaps(start,end,b.startTime,b.endTime));
+
+      // Client pending
+      demo.myQuotes.push({ id: demo.myQuotes.length + 100, title: `${eventType} – ${venue || 'TBD'}`, requested: iso, status: 'Awaiting Reply', amount: budget, venue, town:'', eventType, startTime:start, endTime:end });
+      // Artist queue
+      demo.quotes.push({ id: demo.quotes.length + 1000, name, date: iso, email, phone, notes: notes || `Request for ${eventType} at ${venue || 'TBD'}`, venue, town:'', startTime:start, endTime:end, amount: budget, conflict });
+
+      updateCounts();
+      if(conflict) alert('⚠ Potential conflict: overlaps an existing booking.');
+      coreHideModal('dayModal');
+      showModal('myQuotesModal');
+      return false;
+    }
+
+    // ====== Booking CRUD + Accept/Cancel ======
+    function addBooking(entry){
+      state.calendarEntries.push(entry);
+      demo.allBookings.push({
+        id:demo.allBookings.length+1, title:entry.title, date:entry.date, venue:entry.venue, town:entry.town, fee:entry.fee,
+        status: entry.status==='booked'?'Confirmed':'Pending',
+        agent:entry.agent, gigType:entry.gigType, contact:entry.contact, startTime:entry.startTime, endTime:entry.endTime
+      });
+      rebuildByDateIndex(); recomputeFacets(); updateCounts(); renderAllCalendars();
+    }
+    function coreAddBookingFromForm(e, iso){
+      e.preventDefault();
+      const f=e.target;
+      const entry={
+        date:iso, title:f.title.value.trim(), venue:f.venue.value.trim(), town:f.town.value.trim(),
+        fee:Number(f.fee.value||0), status:f.status.value, agent:f.agent.value.trim(),
+        gigType:f.gigType.value, contact:f.contact.value.trim(),
+        startTime:f.start.value, endTime:f.end.value, notes:f.notes?.value||''
+      };
+      const conflict = (state.byDate.get(iso)||[]).some(b=> overlaps(entry.startTime,entry.endTime,b.startTime,b.endTime));
+      addBooking(entry);
+      if(conflict) alert('⚠ Potential conflict: overlaps an existing booking on this date');
+      coreOnDayClick(iso);
+      return false;
+    }
+    function coreDeleteBooking(iso,index){
+      const list=state.byDate.get(iso)||[];
+      const item=list[index]; if(!item) return;
+      const idx=state.calendarEntries.findIndex(e=>e.date===iso&&e.title===item.title&&e.agent===item.agent&&e.fee===item.fee&&e.startTime===item.startTime&&e.endTime===item.endTime);
+      if(idx>-1) state.calendarEntries.splice(idx,1);
+      const idx2=demo.allBookings.findIndex(b=>b.date===iso && b.title===item.title && b.startTime===item.startTime && b.endTime===item.endTime);
+      if(idx2>-1) demo.allBookings.splice(idx2,1);
+      rebuildByDateIndex(); recomputeFacets(); updateCounts(); coreOnDayClick(iso); renderAllCalendars();
+    }
+    function acceptEntry(iso,index){
+      const item=(state.byDate.get(iso)||[])[index]; if(!item) return;
+      item.status='booked';
+      const demoItem = demo.allBookings.find(b=> b.date===iso && b.title===item.title && b.startTime===item.startTime && b.endTime===item.endTime);
+      if(demoItem) demoItem.status='Confirmed';
+      rebuildByDateIndex(); updateCounts(); coreOnDayClick(iso); renderAllCalendars();
+    }
+    function cancelEntryPrompt(iso,index){
+      const reason = prompt('Cancellation reason (sent to client):','Unforeseen circumstances');
+      if(reason==null) return;
+      cancelEntries([{iso,index}], reason);
+    }
+    function cancelEntries(targets, reason){
+      const ids=[];
+      targets.forEach(({iso,index})=>{
+        const item=(state.byDate.get(iso)||[])[index]; if(!item) return;
+        const demoItem = demo.allBookings.find(b=> b.date===iso && b.title===item.title && b.startTime===item.startTime && b.endTime===item.endTime);
+        if(demoItem){ demoItem.status='Cancelled'; demoItem.notes = (demoItem.notes||'') + `\nCancelled: ${reason}`; ids.push(demoItem.id); }
+        // also remove from calendar view
+        const i=state.calendarEntries.findIndex(e=> e.date===iso && e.title===item.title && e.startTime===item.startTime && e.endTime===item.endTime);
+        if(i>-1) state.calendarEntries.splice(i,1);
+      });
+      rebuildByDateIndex(); updateCounts(); renderAllCalendars();
+      if(ids.length) alert(`Client notified: cancelled ${ids.length} booking(s).\nReason: ${reason}`);
+      coreHideModal('cancelCenterModal');
+      coreOnDayClick(targets[0]?.iso || yyMmDd(new Date()));
+    }
+
+    // ====== Modals framework ======
+    const modalRenderers = {
+      totalBookingsModal:renderTotalBookings, upcomingShowsModal:renderUpcomingShows,
+      quoteRequestsModal:renderQuoteRequests, pendingContractsModal:renderPendingContracts,
+      contractTemplatesModal:renderContractTemplates, financialReportsModal:renderFinancialReports,
+      clientDatabaseModal:renderClientDatabase, myBookingsModal:renderMyBookings, myQuotesModal:renderMyQuotes,
+      artistPortfolioModal:renderArtistPortfolio, clientMessagesModal:renderClientMessages, artistShowsModal:renderArtistShows,
+      clientMediaModal:renderClientMedia, paymentPortalModal:renderPayments, pdfImportModal:renderPdfImportHelp,
+      cancelCenterModal:renderCancelCenter, agencyManagerModal:renderAgencyManager, dayModal:()=>{}
+    };
+    function renderList(containerId, items){ const c=document.getElementById(containerId); if(c) c.innerHTML = items.join(''); }
+    function coreShowModal(id){ seedDemo(); const el=document.getElementById(id); if(!el) return; if(modalRenderers[id]) modalRenderers[id](); el.style.display='block'; }
+    function coreHideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+    // ====== Counters ======
+    function updateCounts(){
+      const total=demo.allBookings.length;
+      const upcoming=demo.upcoming.length;
+      const quotesArtist=demo.quotes.length;
+      const pendingContracts=demo.allBookings.filter(b=>b.status!=='Confirmed').length;
+      const elems=[['totalBookingsCount',total],['upcomingShowsCount',upcoming],['quoteRequestsCount',quotesArtist],['pendingContractsCount',pendingContracts]];
+      elems.forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); });
+      const myB=demo.myBookings.length, pendQ=demo.myQuotes.filter(q=>/await/i.test(q.status)).length, port=demo.portfolio.length, msgs=demo.messages.length;
+      [['clientMyBookingsCount',myB],['clientPendingQuotesCount',pendQ],['clientPortfolioCount',port],['clientMessagesCount',msgs]].forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.textContent=String(val); });
+    }
+
+    // ====== Renderers ======
+    function renderTotalBookings(){
+      const rows = demo.allBookings.slice().sort((a,b)=> a.date.localeCompare(b.date)).map(b=>{
+        const conflict = (state.byDate.get(b.date)||[]).some(x=> x.startTime&&x.endTime&&b.startTime&&b.endTime && x!==b && overlaps(x.startTime,x.endTime,b.startTime,b.endTime));
+        return `<div class="item${conflict?'":" style="border-color:#ef4444"':''}" onclick="onDayClick('${b.date}')">
+          <strong>${b.title}</strong>
+          <div class="meta">${toUK(b.date)} • ${b.venue}, ${b.town} • ⏰ ${b.startTime||'??:??'}–${b.endTime||'??:??'} • ${formatCurrency(b.fee)} • <span class="chip">${b.agent}</span><span class="chip">${b.status}</span></div>
+          <div class="hint">Click to open day</div>
+        </div>`;
+      });
+      renderList('totalBookingsBody', rows);
+    }
+    function renderUpcomingShows(){
+      renderList('upcomingShowsBody', demo.upcoming.map(u=>`<div class="item" onclick="onDayClick('${u.date}')"><strong>${u.title}</strong><div class="meta">${toUK(u.date)} • ${u.venue}</div><div class="meta">Checklist: ${u.checklist.join(', ')}</div><div class="hint">Click to open day</div></div>`));
+    }
+    function approveQuote(id){
+      const q=demo.quotes.find(x=>x.id===id); if(!q) return;
+      // create placeholder booking
+      const entry={ date:q.date, title:`From Quote — ${q.venue||'Venue'}`, venue:q.venue, town:q.town, fee:q.amount, status:'pending', agent:'', gigType:q.eventType||'Custom', contact:q.name, startTime:q.startTime, endTime:q.endTime };
+      addBooking(entry);
+      // remove from queue
+      const idx=demo.quotes.findIndex(x=>x.id===id); if(idx>-1) demo.quotes.splice(idx,1);
+      updateCounts(); renderQuoteRequests();
+      alert('Quote approved → added as pending booking for '+toUK(q.date));
+    }
+    function renderQuoteRequests(){
+      const now=new Date();
+      const inDays=(iso)=> Math.ceil((new Date(iso+'T00:00:00')-now)/86400000);
+      const rows = demo.quotes.slice().sort((a,b)=> a.date.localeCompare(b.date)).map(q=>{
+        const border = q.conflict ? ' style="border-color:#ef4444"' : '';
+        return `<div class="item"${border} onclick="onDayClick('${q.date}')">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
+            <div style="flex:1;">
+              <div style="font-weight:800;">${q.name}</div>
+              <div class="meta"><strong>Date:</strong> ${toUK(q.date)} • ⏰ ${q.startTime||'??:??'}–${q.endTime||'??:??'}</div>
+              <div class="meta"><strong>Venue:</strong> ${q.venue||'TBD'}</div>
+              <div class="meta"><strong>Email:</strong> ${q.email}</div>
+              <div class="meta"><strong>Phone:</strong> ${q.phone}</div>
+              <div class="meta"><strong>Notes:</strong> ${q.notes}</div>
+              ${q.conflict?'<div class="hint" style="color:#b42318;">⚠ Conflicts with an existing booking</div>':''}
+              <div class="hint">Click to open day</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-primary" onclick="event.stopPropagation(); approveQuote(${q.id})">Approve → Booking</button>
+              <button class="btn" onclick="event.stopPropagation(); alert('Modify quote #${q.id}')">Modify</button>
+            </div>
+          </div>
+        </div>`;
+      });
+      const urgent = demo.quotes.filter(q=> inDays(q.date)<=30).length;
+      const soon   = demo.quotes.filter(q=> inDays(q.date)>30 && inDays(q.date)<=60).length;
+      rows.push(`<div class="item"><strong>Urgency:</strong> <span style="color:#b42318;font-weight:800;">${urgent} within 30 days</span> • <span style="color:#b45309;font-weight:800;">${soon} within 60 days</span></div>`);
+      renderList('quoteRequestsBody', rows);
+    }
+    function renderPendingContracts(){
+      const now=new Date();
+      const inDays=(iso)=> Math.ceil((new Date(iso+'T00:00:00')-now)/86400000);
+      const list=demo.allBookings.filter(b=>b.status!=='Confirmed');
+      const rows=list.map(b=>`<div class="item" onclick="onDayClick('${b.date}')"><strong>${b.title}</strong><div class="meta">${toUK(b.date)} • ${b.venue} • ⏰ ${b.startTime||'??:??'}–${b.endTime||'??:??'} • Contract pending</div></div>`);
+      const urgent = list.filter(b=> inDays(b.date)<=30).length;
+      const soon   = list.filter(b=> inDays(b.date)>30 && inDays(b.date)<=60).length;
+      rows.push(`<div class="item"><strong>Urgency:</strong> <span style="color:#b42318;font-weight:800;">${urgent} within 30 days</span> • <span style="color:#b45309;font-weight:800;">${soon} within 60 days</span></div>`);
+      renderList('pendingContractsBody', rows);
+    }
+    function renderContractTemplates(){
+      const body=document.getElementById('contractTemplatesBody');
+      const templates = window._templates || ([
+        {id:1,name:'Standard Performance Agreement', body:'Artist • Client • Fee • Cancellation • Force Majeure'},
+        {id:2,name:'Wedding Package Agreement', body:'Schedule • Song requests • Sound & lighting • Overtime • Responsibilities'}
+      ]);
+      window._templates = templates;
+      body.innerHTML = `
+        <div class="row">
+          <label style="grid-column:1 / -1"><span>Search templates</span><input class="input" id="tplSearch" placeholder="Type to filter..."></label>
+        </div>
+        <div id="tplList" class="mt-12" style="max-height:45vh; overflow:auto;"></div>
+        <div class="item mt-12">
+          <strong>Add template</strong>
+          <div class="row">
+            <label><span>Name</span><input class="input" id="tplName"></label>
+            <label><span>Body</span><input class="input" id="tplBody"></label>
+          </div>
+          <div style="text-align:right;"><button class="btn btn-primary" onclick="addTemplate()">Add</button></div>
+        </div>`;
+      function draw(){
+        const q=(document.getElementById('tplSearch').value||'').toLowerCase();
+        const list=templates.filter(t=> t.name.toLowerCase().includes(q));
+        document.getElementById('tplList').innerHTML = list.map(t=>`<div class="item"><strong>${t.name}</strong><div class="meta">${t.body}</div></div>`).join('') || '<div class="item">No templates found.</div>';
+      }
+      window.addTemplate = function(){
+        const n=document.getElementById('tplName').value.trim();
+        const b=document.getElementById('tplBody').value.trim();
+        if(!n) return;
+        templates.push({id:Date.now(), name:n, body:b});
+        document.getElementById('tplName').value='';
+        document.getElementById('tplBody').value='';
+        draw();
+      };
+      document.getElementById('tplSearch').oninput = draw;
+      draw();
+    }
+    function renderFinancialReports(){
+      const conf=demo.allBookings.filter(b=>b.status==='Confirmed').reduce((s,b)=>s+(b.fee||0),0);
+      const pipe=demo.allBookings.filter(b=>b.status!=='Confirmed').reduce((s,b)=>s+(b.fee||0),0);
+      const byAgency={}; demo.allBookings.forEach(b=>{byAgency[b.agent]=(byAgency[b.agent]||0)+(b.fee||0)});
+      const rows = [
+        `<div class="item"><strong>Revenue (Confirmed):</strong> ${formatCurrency(conf)}</div>`,
+        `<div class="item"><strong>Pipeline (Pending/Provisional):</strong> ${formatCurrency(pipe)}</div>`,
+        `<div class="item"><strong>By Agency</strong><div class="meta">${Object.entries(byAgency).map(([k,v])=>`${k}: ${formatCurrency(v)}`).join(' • ')}</div></div>`
+      ];
+      renderList('financialReportsBody', rows);
+    }
+    function renderClientDatabase(){
+      const body=document.getElementById('clientDatabaseBody');
+      const agencies = state.agencies.slice(); // for dropdown
+      body.innerHTML = `
+        <div class="row">
+          <label style="grid-column:1 / -1"><span>Search clients</span><input class="input" id="clientSearch" placeholder="Type a client name..."></label>
+        </div>
+        <div id="clientList" class="mt-12" style="max-height:55vh; overflow:auto;"></div>`;
+      function draw(){
+        const q=(document.getElementById('clientSearch').value||'').toLowerCase();
+        const list=demo.clients.filter(c=>!q || c.name.toLowerCase().includes(q)).slice().sort((a,b)=> a.name.localeCompare(b.name));
+        document.getElementById('clientList').innerHTML = list.map(c=>`
+          <div class="item">
+            <strong>${c.name}</strong>
+            <div class="meta">${c.email} • ${c.phone} • Last booking: ${toUK(c.last)}</div>
+            <div class="row">
+              <label><span>Agency</span>
+                <select class="input" onchange="assignAgency('${c.id}', this.value)">
+                  <option value="">— None —</option>
+                  ${agencies.map(a=>`<option ${c.agency===a.name?'selected':''}>${a.name}</option>`).join('')}
+                </select>
+              </label>
+              <div></div>
+            </div>
+          </div>`).join('') || '<div class="item">No clients found.</div>';
+      }
+      window.assignAgency = function(id, val){
+        const c=demo.clients.find(x=> String(x.id)===String(id)); if(c){ c.agency = val||''; if(val && !state.agencies.find(a=>a.name===val)){ state.agencies.push({name:val, color: colorForAgency(val)}); renderAgencyLegend(); } }
+      };
+      document.getElementById('clientSearch').oninput = draw;
+      draw();
+    }
+    function renderMyBookings(){
+      renderList('myBookingsBody', demo.myBookings.map((b,idx)=>`<div class="item"><strong>${toUK(b.date)} • ${b.venue} • ⏰ ${b.startTime||'??:??'}–${b.endTime||'??:??'}</strong><div class="meta">${b.location} • <span class="chip">${b.status}</span></div><div class="mt-12"><button class="btn" onclick="openCancelCenter([{iso:'${b.date}', index:0}], 'Reason for cancelling…')">Cancel…</button></div></div>`));
+    }
+    function renderMyQuotes(){
+      const pending=demo.myQuotes.filter(q=>/await/i.test(q.status));
+      renderList('myQuotesBody', pending.map(q=>`<div class="item"><strong>${toUK(q.requested)} • ${q.town||'City'} • ⏰ ${q.startTime||'??:??'}–${q.endTime||'??:??'}</strong><div class="meta">${q.venue || 'Venue TBC'} • £${q.amount}</div></div>`));
+    }
+    function renderArtistPortfolio(){
+      renderList('artistPortfolioBody', demo.portfolio.map(p=>`<div class="item"><strong>${p.title}</strong> <span class="chip">${p.type}</span><div class="meta">Tags: ${p.tags.join(', ')}</div></div>`));
+    }
+    function renderClientMessages(){
+      renderList('clientMessagesBody', demo.messages.map(m=>`<div class="item"><strong>${m.from}</strong><div class="meta">${m.when} • "${m.excerpt}"</div></div>`));
+    }
+    function renderArtistShows(){
+      const body=document.getElementById('artistShowsBody');
+      const items = window._shows || demo.shows.slice();
+      window._shows = items;
+      body.innerHTML = `
+        <div class="row">
+          <label style="grid-column:1 / -1"><span>Search packages</span><input class="input" id="showSearch" placeholder="Type to filter..."></label>
+        </div>
+        <div id="showsList" class="mt-12" style="max-height:45vh; overflow:auto;"></div>
+        <div class="item mt-12">
+          <strong>Add package</strong>
+          <div class="row">
+            <label><span>Name</span><input class="input" id="showName"></label>
+            <label><span>Price (£)</span><input class="input" id="showPrice" type="number" min="0"></label>
+          </div>
+          <div class="row" style="grid-template-columns:1fr;">
+            <label><span>Notes</span><input class="input" id="showNotes"></label>
+          </div>
+          <div style="text-align:right;"><button class="btn btn-primary" onclick="addShow()">Add</button></div>
+        </div>`;
+      function draw(){
+        const q=(document.getElementById('showSearch').value||'').toLowerCase();
+        const list=items.filter(s=> s.name.toLowerCase().includes(q));
+        document.getElementById('showsList').innerHTML = list.map(s=>`<div class="item"><strong>${s.name}</strong><div class="meta">${formatCurrency(s.price)} • ${s.notes}</div></div>`).join('') || '<div class="item">No packages match.</div>';
+      }
+      window.addShow = function(){
+        const n=document.getElementById('showName').value.trim();
+        const p=Number(document.getElementById('showPrice').value||0);
+        const notes=document.getElementById('showNotes').value.trim();
+        if(!n) return;
+        items.push({id:Date.now(), name:n, price:p, notes});
+        document.getElementById('showName').value=''; document.getElementById('showPrice').value=''; document.getElementById('showNotes').value='';
+        draw();
+      };
+      document.getElementById('showSearch').oninput = draw;
+      draw();
+    }
+    function renderClientMedia(){ renderList('clientMediaBody', demo.media.map(f=>`<div class="item"><strong>${f.name}</strong><div class="meta">${f.size} • Uploaded ${toUK(f.uploaded)}</div></div>`)); }
+    function renderPayments(){ renderList('paymentPortalBody', demo.payments.map(p=>`<div class="item"><strong>${p.invoice}</strong><div class="meta">Due ${toUK(p.due)} • ${formatCurrency(p.amount)} • <span class="chip">${p.status}</span></div></div>`)); }
+    function renderPdfImportHelp(){ renderList('pdfImportBody', [`<p>This is a demo placeholder. Select a PDF to simulate parsing.</p>`,`<input type="file" accept="application/pdf" class="input" />`,`<div class="item"><strong>Tips:</strong><div class="meta">• Contracts/confirmation sheets supported<br>• Bookings, fees, and dates will be auto-detected in a future build</div></div>`]); }
+
+    // ====== Cancel Center ======
+    function renderCancelCenter(){
+      const body=document.getElementById('cancelCenterBody');
+      const list = demo.allBookings.slice().sort((a,b)=> a.date.localeCompare(b.date));
+      body.innerHTML = `
+        <div class="item">
+          <strong>Select bookings to cancel</strong>
+          <div id="cancelList" class="mt-12" style="max-height:40vh; overflow:auto;">
+            ${list.map((b,idx)=>`<label style="display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--border); padding:8px 0;">
+              <input type="checkbox" data-iso="${b.date}" data-index="${idx}">
+              <span>${toUK(b.date)} • ${b.venue||b.title} • ⏰ ${b.startTime||'??:??'}–${b.endTime||'??:??'} • <em class="meta">${b.status}</em></span>
+            </label>`).join('')}
+          </div>
+          <div class="row" style="grid-template-columns:1fr;">
+            <label><span>Cancellation reason (sent to client)</span><textarea class="input" id="cancelReason" placeholder="Illness, unavoidable conflict, venue closure…"></textarea></label>
+          </div>
+          <div class="mt-12" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="meta">One email/message will be sent listing all selected cancellations.</div>
+            <button class="btn btn-danger" onclick="submitCancel()">Cancel selected</button>
+          </div>
+        </div>`;
+      window.submitCancel = function(){
+        const reason = document.getElementById('cancelReason').value.trim() || 'No reason given';
+        const boxes = Array.from(document.querySelectorAll('#cancelList input[type=checkbox]:checked'));
+        if(!boxes.length) return alert('Select at least one booking.');
+        const targets = boxes.map(b=> ({ iso:b.getAttribute('data-iso'), index: Number(b.getAttribute('data-index')) }));
+        cancelEntries(targets, reason);
+      };
+    }
+    function openCancelCenter(preselect, placeholder){
+      showModal('cancelCenterModal');
+      // Could pre-check boxes if needed; keeping simple.
+      if(placeholder){ const t=document.getElementById('cancelReason'); if(t) t.placeholder=placeholder; }
+    }
+
+    // ====== Agencies manager ======
+    function renderAgencyManager(){
+      const body=document.getElementById('agencyManagerBody');
+      body.innerHTML = `
+        <div class="row">
+          <label><span>Agency name</span><input class="input" id="agName" placeholder="e.g., Flyde, Prestige"></label>
+          <label><span>Colour (optional)</span><input class="input" id="agColor" type="color" value="#444444"></label>
+        </div>
+        <div style="text-align:right;"><button class="btn btn-primary" onclick="addAgency()">Add agency</button></div>
+        <div class="mt-12" style="max-height:45vh; overflow:auto;" id="agList"></div>`;
+      window.addAgency = function(){
+        const name=(document.getElementById('agName').value||'').trim();
+        let color=document.getElementById('agColor').value;
+        if(!name) return;
+        if(!/^#/.test(color)) color = colorForAgency(name);
+        if(!state.agencies.find(a=>a.name.toLowerCase()===name.toLowerCase())){
+          state.agencies.push({name,color});
+          renderAgencyLegend();
+          draw();
+          document.getElementById('agName').value='';
+        }
+      };
+      function draw(){
+        document.getElementById('agList').innerHTML = state.agencies.map((a,idx)=>`
+          <div class="item" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div><span class="chip" style="border-color:${a.color}; color:${a.color}"><span class="dot" style="background:${a.color}"></span>${a.name}</span></div>
+            <div style="display:flex; gap:8px;">
+              <input type="color" value="${a.color}" onchange="updateAgencyColor(${idx}, this.value)" />
+              <button class="btn" onclick="removeAgency(${idx})">Delete</button>
+            </div>
+          </div>`).join('') || '<div class="item">No agencies yet.</div>';
+      }
+      window.updateAgencyColor = function(idx, color){ const a=state.agencies[idx]; if(a){ a.color=color; renderAgencyLegend(); draw(); } };
+      window.removeAgency = function(idx){ state.agencies.splice(idx,1); renderAgencyLegend(); draw(); };
+      draw();
+    }
+    function toggleAgencyLegend(){ state.showAgencyLegend = !state.showAgencyLegend; renderAgencyLegend(); }
+
+    // ====== Selection / auth ======
+    window.selectUserType = function(type){
+      state.userType = type;
+      document.getElementById('artistBtn').classList.toggle('active', type==='artist');
+      document.getElementById('clientBtn').classList.toggle('active', type==='client');
+      const cards=document.getElementById('loginCards');
+      if(type==='artist'){
+        cards.innerHTML = `<article class="card" onclick="login('artist')"><div class="card-icon">🎤</div><div class="card-title">Artist Dashboard</div><p class="card-desc">Color-coded bookings, agency labels, PDF import. Click to enter.</p></article>`;
+      } else {
+        cards.innerHTML = `<article class="card" onclick="login('client')"><div class="card-icon">🧑‍💼</div><div class="card-title">Client Portal</div><p class="card-desc">Browse availability, request quotes, and manage your bookings.</p></article>`;
+      }
+    };
+    window.login = function(type){
+      document.getElementById('welcomeSection').style.display='none';
+      document.getElementById('headerNav').style.display='flex';
+      document.getElementById('userName').textContent = type==='artist'?'Artist':'Client';
+      document.getElementById('artistDashboard').style.display = (type==='artist')?'block':'none';
+      document.getElementById('clientDashboard').style.display = (type==='client')?'block':'none';
+      renderAllCalendars();
+      seedDemo();
+    };
+    window.logout = function(){
+      document.getElementById('welcomeSection').style.display='block';
+      document.getElementById('headerNav').style.display='none';
+      document.getElementById('artistDashboard').style.display='none';
+      document.getElementById('clientDashboard').style.display='none';
+    };
+    window.testFunction = function(){ alert('JavaScript is working ✔'); };
+
+    window.switchClientCalendar = function(which){
+      const my=document.getElementById('myBookingsCalendar'), av=document.getElementById('artistAvailabilityCalendar'), myBtn=document.getElementById('myBookingsCalBtn'), avBtn=document.getElementById('artistAvailabilityCalBtn');
+      const showMy = which==='myBookings';
+      my.style.display = showMy?'block':'none';
+      av.style.display = showMy?'none':'block';
+      myBtn.className='btn' + (showMy?' btn-primary':''); avBtn.className='btn' + (!showMy?' btn-primary':'');
+      renderAllCalendars();
+    };
+    window.requestCalendarAccess = function(){ alert('Request sent to artist.'); };
+    window.toggleArtistAccess = function(){
+      state.sharedArtistAccess = !state.sharedArtistAccess;
+      document.getElementById('noArtistAssigned').style.display = state.sharedArtistAccess?'none':'block';
+      document.getElementById('sharedArtistCalendar').style.display = state.sharedArtistAccess?'block':'none';
+      renderAllCalendars();
+    };
+
+    // Expose wrappers
+    window.changeMonth = function(d){ state.monthIndex += d; renderAllCalendars(); };
+    window.onDayClick = coreOnDayClick;
+    window.addBookingFromForm = coreAddBookingFromForm;
+    window.deleteBooking = coreDeleteBooking;
+    window.acceptEntry = acceptEntry;
+    window.cancelEntryPrompt = cancelEntryPrompt;
+    window.showModal = coreShowModal;
+    window.hideModal = coreHideModal;
+    window.openRequestQuoteForm = openRequestQuoteForm;
+    window.submitClientQuote = submitClientQuote;
+    window.toggleAgencyLegend = toggleAgencyLegend;
+    window.openCancelCenter = openCancelCenter;
+
+    // ====== Self tests ======
+    function runSelfTests(){
+      const results=[];
+      try{
+        results.push(['selectUserType available', typeof window.selectUserType==='function']);
+        results.push(['login available', typeof window.login==='function']);
+        results.push(['calendar renders', !!document.getElementById('calendarGrid')]);
+        const testDate='2029-12-01';
+        const before=getDayAvailability(testDate); results.push(['availability initially available', before==='available']);
+        addBooking({date:testDate,title:'TEST1',venue:'Hall',town:'Town',fee:120,status:'booked',agent:'A',gigType:'Test',contact:'X',startTime:'19:00',endTime:'21:00'});
+        const after1=getDayAvailability(testDate); results.push(['becomes partial after 1 booking', after1==='partial']);
+        addBooking({date:testDate,title:'TEST2',venue:'Hall',town:'Town',fee:130,status:'booked',agent:'A',gigType:'Test',contact:'X',startTime:'21:00',endTime:'23:00'});
+        const after2=getDayAvailability(testDate); results.push(['becomes full after 2 bookings', after2==='full']);
+        coreDeleteBooking(testDate,0); results.push(['delete booking ok', true]);
+        coreShowModal('quoteRequestsModal'); const qrHas = (document.getElementById('quoteRequestsBody').innerHTML.trim().length>0); coreHideModal('quoteRequestsModal'); results.push(['quoteRequests renders', qrHas]);
+        coreShowModal('totalBookingsModal'); coreShowModal('totalBookingsModal'); coreHideModal('totalBookingsModal'); results.push(['showModal double-call safe', true]);
+        updateCounts(); const cmq=document.getElementById('clientPendingQuotesCount'); results.push(['client pending quotes count exists', !!cmq]);
+        const prev=state.monthIndex; window.changeMonth(1); const changed=(state.monthIndex===prev+1); window.changeMonth(-1); results.push(['changeMonth updates state', changed]);
+      }catch(err){ results.push(['unexpected error: '+err.message, false]); }
+      const html = results.map(([name,ok])=>`<div class="item"><strong>${ok?'✅':'❌'} ${name}</strong></div>`).join('');
+      document.getElementById('diagnosticsBody').innerHTML = html;
+      coreShowModal('diagnosticsModal');
+    }
+    window.runSelfTests = runSelfTests;
+
+    // Global events
+    window.addEventListener('click', (e)=>{ if(e.target.classList && e.target.classList.contains('modal')) e.target.style.display='none'; });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); });
+
+    // Init
+    (function init(){ renderAllCalendars(); seedDemo(); })();
+  </script>
+</body>
+</html>
+
+# Performance Hub — Codex Starter
+
+This folder is self-contained. No build step required.
+
+## Quick run (recommended)
+1) Open Codex → **Create environment**.
+2) Upload this whole ZIP and extract it (or upload the files).
+3) In the terminal, run:
+
+```bash
+bash start.sh
+```
+
+Then open the preview on **port 5173** (or whatever the terminal prints).
+
+## If bash/Python isn't available
+Run a Node static server instead:
+
+```bash
+npx http-server -p 5173 -c-1 .
+```
+
+(You may need to run `npm i -g http-server` first.)
+
+## Files
+- `index.html` – the full single-file app.
+- `start.sh` — launches a Python static server on port 5173.
+- `README.md` — these instructions.
+
+#!/usr/bin/env bash
+set -e
+PORT=${PORT:-5173}
+echo "Starting static server on port $PORT ..."
+python3 -m http.server "$PORT"
